@@ -1,0 +1,6 @@
+14:00:42 File ConfigAP.py [INFO] - AP Activa
+14:00:42File Connect_Checker.py [INFO] NO REBOOT: credenciales correctas
+14:09:54 File ConfigAP.py [INFO] - AP Inactiva
+14:09:54 File ConfigAP.py [INFO] - AP Inactiva
+14:09:54 File ConfigAP.py [OK] - ON
+14:09:54File Connect_Checker.py [INFO] REBOOT: por credenciales erroneas

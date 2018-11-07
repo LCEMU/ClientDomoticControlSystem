@@ -1,0 +1,76 @@
+h2 {
+	padding-top:	15px;
+}
+
+input[type=text], input[type=password], select {
+    width:	100%;
+    padding:	12px 20px;
+    margin:	8px 0;
+    display:	inline-block;
+    border:	1px solid #ccc;
+    border-radius:	4px;
+    box-sizing: border-box;
+}
+
+input[type=submit] {
+    width:	100%;
+    background-color:	#4CAF50;
+    color:	white;
+    padding:	14px 20px;
+    margin:	8px 0;
+    border:	none;
+    border-radius:	4px;
+    cursor:	pointer;
+}
+
+input[type=submit]:hover {
+    background-color:	#45a049;
+}
+
+div.out {
+    border-radius:	5px;
+    padding-left:	150px;
+    padding-right:	150px;
+    padding-bottom:	150px;
+}
+
+div.in {
+    border-radius:	5px;
+    background:		#F2F2F2;
+    padding-left:	100px;
+    padding-right:	100px;
+    padding-bottom:	100px;
+}
+
+p {
+	padding-top: 10px;
+}
+
+table {
+    font-family:	arial, sans-serif;
+    border-collapse:	collapse;
+    width:	100%;
+}
+
+th {
+    border:	1px solid #dddddd;
+    text-align:	left;
+    padding:	8px;
+    background-color:	#E6E6E6;
+}
+
+td {
+    border:	1px solid #dddddd;
+    text-align:	left;
+    padding:	8px;
+    background-color:	#FFFFFF;
+}
+
+p.aviso {
+    font-style: italic;
+    font-size: 15px;
+}
+
+.error {
+	color: #FF0000;
+}
