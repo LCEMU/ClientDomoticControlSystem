@@ -60,8 +60,7 @@ class Device:
     ##################################################
     def get_code_verify (self):
 
-        ############# DESCOMENTAR ##############
-        '''
+        ############# DESCOMENTAR ##############        
         file_config = ctes.FILE_WIFI_CONFIG
         if os.path.isfile(file_config):
             # Leer el archivo de configuracion:
@@ -72,9 +71,9 @@ class Device:
                 codeVerify = configuracion.get('SECURITY','VERIFY_CODE')
 
         return codeVerify
-        '''
+        
         ################## COMENTAR ##################
-        return 'bRm'
+        #return 'bRm'
         
 
     #####################################################
@@ -190,15 +189,15 @@ class Sensor(Device):
                 print ("[Error PUT] Error al crear el elemento JSON")
     
     def get_info(self):
-        #super(Device, self).obtiene_informacion()
+
         # Configuracion del tipo de sensor DHT
         ####################### DESCOMENTAR #####################
-        #sensor = Adafruit_DHT.DHT11        
-        #humidity, temp = Adafruit_DHT.read_retry(sensor, self.pin)
+        sensor = Adafruit_DHT.DHT11        
+        humidity, temp = Adafruit_DHT.read_retry(sensor, self.pin)
         
         ########## DUMMY - COMENTAR ###########
-        return 15, 20
-        return temp, humidity
+        #return 15, 20
+        #return temp, humidity
     
     def save_data(self, data):
         
@@ -212,7 +211,6 @@ class Sensor(Device):
         print("Dat: ", dat, type(dat))
 
         ###################### DESCOMENTAR ######################
-        '''
         conn = sqlite3.connect('./BBDD/devices_domotica.db')
         cursor = conn.cursor()
 
@@ -221,7 +219,7 @@ class Sensor(Device):
         
         conn.commit()
         conn.close()
-        '''
+
         print("[SENSOR] Insercion correcta.")
 
 ##############################################################
@@ -242,7 +240,8 @@ class Actuador(Device):
         self.id = -1
         self.code = ""
 
-    ######### COMENTAR - ESTO ES SOLO PARA PROBAR SIN CORRER EL SERVIDOR ON/OFF #########  
+    ######### COMENTAR - ESTO ES SOLO PARA PROBAR SIN CORRER EL SERVIDOR ON/OFF ######### 
+    '''
     def prueba_borrar(self):#recojo de teclado si la activacion o desactivacion del rele
         print("INTRODUCIR On(1)/Off(0), PARA ACTIVAR O DESACTIVAR EL RELE: ")
         res = input()
@@ -250,25 +249,25 @@ class Actuador(Device):
         return res  
 
     def ini_actuador(self):
-        '''
+        
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.pin, GPIO.OUT)
-        '''
-        return "------> Ini actuador"
+        
+        #return "------> Ini actuador"
         
     def activa_actuador(self):
-        '''
+        
         GPIO.output(self.pin, GPIO.HIGH)
-        '''
-        return "------> Activar actuador"
+        
+        #return "------> Activar actuador"
         
     def desactiva_actuador(self):
-        '''
+        
         GPIO.output(self.pin, GPIO.LOW)
-        '''
-        return "------> Desactivar actuador"
-    
+        
+        #return "------> Desactivar actuador"
+    '''
     #####################################################################################  
 
     def start_connection(self):
@@ -303,7 +302,7 @@ class Actuador(Device):
         condition = True
 
         ######### COMENTAR - ESTO ES SOLO PARA PROBAR SIN CORRER EL SERVIDOR ON/OFF #########  
-        self.ini_actuador()
+        #self.ini_actuador()
         #####################################################################################
 
         try:
@@ -312,14 +311,14 @@ class Actuador(Device):
                 print ("Esperando...")
                 time.sleep(self.freq)
                 
-                # Recibo un post con la mi ip el json(id y la accion(ON/OF))
+                # Recibo un post con un json(id y la accion(ON/OF))
                 ######### COMENTAR - ESTO ES SOLO PARA PROBAR SIN CORRER EL SERVIDOR ON/OFF #########
                 # cada x tiempo (freq) enviar un put con la info necesaria
                 
-                if self.prueba_borrar() == 1:
-                    self.activa_actuador()
-                else:
-                    self.desactiva_actuador()
+                #if self.prueba_borrar() == 1:
+                #    self.activa_actuador()
+                #else:
+                #    self.desactiva_actuador()
                 #####################################################################################
 
                 state = self.get_info()
@@ -349,7 +348,7 @@ class Actuador(Device):
         print("Id: ", self.id, type(self.id))
         
         ###################### DESCOMENTAR ######################
-        '''
+        
         conn = sqlite3.connect('./BBDD/devices_domotica.db')
         cursor = conn.cursor()
 
@@ -358,18 +357,16 @@ class Actuador(Device):
         
         conn.commit()
         conn.close()
-        '''
+        
         print("[ACTUADOR] Insercion correcta.")
     
     def get_info(self):
         ########################### DESCOMENTAR ###################
-        '''
+        
         if GPIO.input(self.pin) == GPIO.LOW:
             return "Inactivo" #el rele esta desactivado
         else:
             return "Activo" #el rele esta activado
-        '''
-        ##########################################################
-
+        
         ######################## COMENTAR ##################################
-        return "<Estado del Actuador>"
+        #return "<Estado del Actuador>"
