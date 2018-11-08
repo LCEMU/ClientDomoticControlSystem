@@ -1,5 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
+import os
 import simplejson as json
+import subprocess
 #import RPi.GPIO as GPIO
 import numpy as np
 import time
@@ -14,11 +16,11 @@ class myHandler(BaseHTTPRequestHandler):
     #   pin, GPIO al cual esta conectado el actuador
     ##########################################################################
     def config_RPi(self, pin):
-        
+        '''
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(pin, GPIO.OUT)
-        
-        #return "------> Ini actuador"
+        '''
+        return "------> Ini actuador"
 
 
     ##########################################################################
@@ -27,11 +29,11 @@ class myHandler(BaseHTTPRequestHandler):
     #   pin, GPIO al cual esta conectado el actuador
     ##########################################################################
     def activate_actuator(self, pin):
-        
-        self.config_RPi()
+        '''
+        self.config_RPi(pin)
         GPIO.output(pin, GPIO.HIGH)
-        
-        #return "------> Activar actuador"
+        '''
+        return "------> Activar actuador"
         
 
     ##########################################################################
@@ -40,11 +42,11 @@ class myHandler(BaseHTTPRequestHandler):
     #   pin, GPIO al cual esta conectado el actuador
     ##########################################################################
     def desactivate_actuator(self, pin):
-        
-        self.config_RPi()
+        '''
+        self.config_RPi(pin)
         GPIO.output(pin, GPIO.LOW)
-        
-        #return "------> Desactivar actuador"
+        '''
+        return "------> Desactivar actuador"
 
     #############################################################
     # Guardar los data en la BBDD
@@ -110,6 +112,8 @@ class myHandler(BaseHTTPRequestHandler):
         cursor.execute(query, (id_device,))
 
         row = cursor.fetchone()
+        print ("ROW: ", row)
+        print ("ROW[0]: ", row[0])
 
         pin = row[0]
         print ("PIN: ", pin)
@@ -144,7 +148,16 @@ class myHandler(BaseHTTPRequestHandler):
 
 class http_server:
     def __init__(self):
-        server = HTTPServer(('localhost', 4443), myHandler)
+        wlan0 = subprocess.check_output('ifconfig wifi0 | grep "inet "', shell=True)
+        wlan0 = wlan0.split()
+        wlan0_map = map(lambda x: x.decode('UTF-8'), wlan0)
+        count=0
+        if "inet" in wlan0_map:
+            ip = wlan0[1].decode('UTF-8')
+        else:
+            print("ERR")
+
+        server = HTTPServer((ip, 4443), myHandler)
         server.serve_forever()
 
 class main:
