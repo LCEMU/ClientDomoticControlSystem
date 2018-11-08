@@ -1,14 +1,12 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
-import os
 import simplejson as json
 import subprocess
-#import RPi.GPIO as GPIO
-import numpy as np
+import RPi.GPIO as GPIO
 import time
 import sqlite3
 
 class myHandler(BaseHTTPRequestHandler):
-        
+
     ##########################################################################
     # Configuramos el modo de distribucion de los GPIO de la RPi y establecemos
     #  el 'pin' del dispositivo como salida
@@ -16,12 +14,9 @@ class myHandler(BaseHTTPRequestHandler):
     #   pin, GPIO al cual esta conectado el actuador
     ##########################################################################
     def config_RPi(self, pin):
-        
+
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(pin, GPIO.OUT)
-        
-        #return "------> Ini actuador"
-
 
     ##########################################################################
     # Activamos el GPIO que indica 'pin' al cual esta conectado el actuador
@@ -29,12 +24,8 @@ class myHandler(BaseHTTPRequestHandler):
     #   pin, GPIO al cual esta conectado el actuador
     ##########################################################################
     def activate_actuator(self, pin):
-        
         self.config_RPi(pin)
         GPIO.output(pin, GPIO.HIGH)
-        
-        #return "------> Activar actuador"
-        
 
     ##########################################################################
     # Desactivamos el GPIO que indica 'pin' al cual esta conectado el actuador
@@ -42,11 +33,8 @@ class myHandler(BaseHTTPRequestHandler):
     #   pin, GPIO al cual esta conectado el actuador
     ##########################################################################
     def desactivate_actuator(self, pin):
-        
         self.config_RPi(pin)
         GPIO.output(pin, GPIO.LOW)
-        
-        #return "------> Desactivar actuador"
 
     #############################################################
     # Guardar los data en la BBDD
@@ -64,17 +52,17 @@ class myHandler(BaseHTTPRequestHandler):
 
         query = "INSERT INTO activity_device (id, ddate, time, info) VALUES (?,?,?,?)"
         cursor.execute(query, (id_device, date, ttime, data))
-        
+
         conn.commit()
         conn.close()
-        
+
         print("[ACTUADOR] Insercion correcta.")
 
 
     ###############################################################
     # Recogemos las peticiones POST del cliente y si los datos del
     #  mensaje son correctoslos registramos en la bbdd y devolvemos
-    #  un 200 OK si no devolvemos un 400 o un 403 dependiendo del 
+    #  un 200 OK si no devolvemos un 400 o un 403 dependiendo del
     #  tipo de error
     ###############################################################
     def do_POST(self):
@@ -113,19 +101,26 @@ class myHandler(BaseHTTPRequestHandler):
 
         row = cursor.fetchone()
         print ("ROW: ", row)
-        print ("ROW[0]: ", row[0])
 
-        pin = row[0]
-        print ("PIN: ", pin)
-        dev_type = row[1]
-        print ("TIPO: ", dev_type)
-        
-        conn.commit()
-        conn.close()
-        
+	if row is None:
+	    print ("No existen dispositivos registrados para este identificador ("+id_device+")")
+	    self.send_response(400)
+	    self.send_header('Content-type','application/json')
+	    self.end_headers()
+	else:
+            print ("ROW[0]: ", row[0])
+
+            pin = row[0]
+            print ("PIN: ", pin)
+            dev_type = row[1]
+            print ("TIPO: ", dev_type)
+
+            conn.commit()
+	    conn.close()
+
         if dev_type == 'A' and flag_response > 0:
 
-            self.send_response(200)
+	    self.send_response(200)
             self.send_header('Content-type','application/json')
             self.end_headers()
 
@@ -140,15 +135,15 @@ class myHandler(BaseHTTPRequestHandler):
                 self.save_action(id_device, "Disable")
                 print("Apagar led")
         else:
-            self.send_response(403)
+            self.send_response(400)
             self.send_header('Content-type','application/json')
             self.end_headers()
-        
+
         return
 
 class http_server:
     def __init__(self):
-        wlan0 = subprocess.check_output('ifconfig wifi0 | grep "inet "', shell=True)
+        wlan0 = subprocess.check_output('ifconfig wlan0 | grep "inet "', shell=True)
         wlan0 = wlan0.split()
         wlan0_map = map(lambda x: x.decode('UTF-8'), wlan0)
         count=0
@@ -161,8 +156,8 @@ class http_server:
         server.serve_forever()
 
 class main:
-    def __init__(self): 
+    def __init__(self):
         self.server = http_server()
- 
+
 if __name__ == '__main__':
     m = main()

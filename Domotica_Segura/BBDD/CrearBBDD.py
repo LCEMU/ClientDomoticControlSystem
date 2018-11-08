@@ -11,8 +11,8 @@ print(">> [OK] << La base de datos se abrio correctamente")
 
 print("\nIntentamos crear la tabla DEVICE...")
 cursor.execute('''CREATE TABLE device
-                (ID INT NOT NULL,                	
-                PIN TEXT PRIMARY KEY NOT NULL,
+                (ID INT PRIMARY KEY NOT NULL,
+                PIN TEXT NOT NULL,
                 NAME TEXT NOT NULL,
                 TYPE CHAR(1) NOT NULL)''')
 print (">> [OK] << La tabla DEVICE ha sido creada con exito")
