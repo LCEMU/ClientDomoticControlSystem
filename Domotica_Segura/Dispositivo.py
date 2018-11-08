@@ -61,19 +61,19 @@ class Device:
     def get_code_verify (self):
 
         ############# DESCOMENTAR ##############        
-        file_config = ctes.FILE_WIFI_CONFIG
-        if os.path.isfile(file_config):
+        #file_config = ctes.FILE_WIFI_CONFIG
+        #if os.path.isfile(file_config):
             # Leer el archivo de configuracion:
-            configuracion = cp.ConfigParser()
-            configuracion.readfp(open(file_config))
+        #    configuracion = cp.ConfigParser()
+        #    configuracion.readfp(open(file_config))
 
-            if 'SECURITY' in configuracion.sections():
-                codeVerify = configuracion.get('SECURITY','VERIFY_CODE')
+        #    if 'SECURITY' in configuracion.sections():
+        #        codeVerify = configuracion.get('SECURITY','VERIFY_CODE')
 
-        return codeVerify
+        #return codeVerify
         
         ################## COMENTAR ##################
-        #return 'bRm'
+        return 'bRm'
         
 
     #####################################################
@@ -142,8 +142,6 @@ class Sensor(Device):
             post = requests.post(url=url, headers=headers, data=json_str)#, cert('/etc/lighttpd/certs/lighttpd.pem'))
             print ("\n\n--- POST - Sensor ---")
             print ("\tEstado:\t", post.status_code)
-            #print ("\tTexto:\n",post.text)
-            #print ("\tDatos:\n",json_str)
             condition = (post.status_code != 201)
             
         # AQUI DEBO RECOGER EL ID ASIGNADO A ESTE SENSOR        
@@ -195,9 +193,9 @@ class Sensor(Device):
         sensor = Adafruit_DHT.DHT11        
         humidity, temp = Adafruit_DHT.read_retry(sensor, self.pin)
         
-        ########## DUMMY - COMENTAR ###########
+        ######### DUMMY - COMENTAR ###########
         #return 15, 20
-        #return temp, humidity
+        return temp, humidity
     
     def save_data(self, data):
         
@@ -214,7 +212,7 @@ class Sensor(Device):
         conn = sqlite3.connect('./BBDD/devices_domotica.db')
         cursor = conn.cursor()
 
-        query = "INSERT INTO data_device (id, ddate, time, info) VALUES (?,?,?,?)"
+        query = "INSERT INTO activity_device (id, ddate, time, info) VALUES (?,?,?,?)"
         cursor.execute(query, (self.id, date, ttime, dat))
         
         conn.commit()
@@ -342,7 +340,7 @@ class Actuador(Device):
             
     def save_data(self, data):
         
-        date = time.strftime("%d%m%y")
+        date = time.strftime("%d/%m/%Y")
         ttime = time.strftime("%X")
         
         print("Id: ", self.id, type(self.id))
@@ -352,8 +350,8 @@ class Actuador(Device):
         conn = sqlite3.connect('./BBDD/devices_domotica.db')
         cursor = conn.cursor()
 
-        query = "INSERT INTO data_device (id, ddate, time, info) VALUES (?,?,?,?)"
-        cursor.execute(query, (self.id, "Rele", 'A', date, time, data))
+        query = "INSERT INTO activity_device (id, ddate, time, info) VALUES (?,?,?,?)"
+        cursor.execute(query, (self.id, date, ttime, data))
         
         conn.commit()
         conn.close()
@@ -369,4 +367,4 @@ class Actuador(Device):
             return "Activo" #el rele esta activado
         
         ######################## COMENTAR ##################################
-        #return "<Estado del Actuador>"
+        #return "<EstadoAct>"

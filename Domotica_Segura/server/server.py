@@ -16,11 +16,11 @@ class myHandler(BaseHTTPRequestHandler):
     #   pin, GPIO al cual esta conectado el actuador
     ##########################################################################
     def config_RPi(self, pin):
-        '''
+        
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(pin, GPIO.OUT)
-        '''
-        return "------> Ini actuador"
+        
+        #return "------> Ini actuador"
 
 
     ##########################################################################
@@ -29,11 +29,11 @@ class myHandler(BaseHTTPRequestHandler):
     #   pin, GPIO al cual esta conectado el actuador
     ##########################################################################
     def activate_actuator(self, pin):
-        '''
+        
         self.config_RPi(pin)
         GPIO.output(pin, GPIO.HIGH)
-        '''
-        return "------> Activar actuador"
+        
+        #return "------> Activar actuador"
         
 
     ##########################################################################
@@ -42,11 +42,11 @@ class myHandler(BaseHTTPRequestHandler):
     #   pin, GPIO al cual esta conectado el actuador
     ##########################################################################
     def desactivate_actuator(self, pin):
-        '''
+        
         self.config_RPi(pin)
         GPIO.output(pin, GPIO.LOW)
-        '''
-        return "------> Desactivar actuador"
+        
+        #return "------> Desactivar actuador"
 
     #############################################################
     # Guardar los data en la BBDD
