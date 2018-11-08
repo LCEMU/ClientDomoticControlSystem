@@ -1,3 +1,4 @@
+import os
 import json
 import requests
 import time
@@ -18,39 +19,39 @@ import sqlite3
 ##########################################################
 # Clase
 # Nombre: 
-#   Dispositivo
+#   Device
 # Descripcion:
 #   Clase que define las funciones basicas que integran
-#   un dispositivo.
+#   un device.
 # Tipo:
 #   abstracta
 # Atributos:
-#   name, nombre del dispositivo HW
-#   type, tipo del dispositivo
-#   state, estado del dispositivo (Activo/Inactivo)
-#   frecuencia, frecuencia de envio de informacion
-#   gpio, pin de la RPi al que esta conectado
+#   sName, nombre del device HW
+#   sType, tipo del dispositivo
+#   sState, state del dispositivo (Activo/Inactivo)
+#   sFreq, frecuencia de envio de informacion
+#   sGpio, pin de la RPi al que esta conectado
 #   id_device, identificador del dispositivo
 ##########################################################
-class Dispositivo:
+class Device:
     
-    def __init__(self, name, type, state, frecuencia, gpio, id_device):
-        self.nombre = name
-        self.tipo = type
-        self.estado = state
-        self.pin = gpio
-        self.freq = frecuencia
+    def __init__(self, sName, sType, sState, sFreq, sGpio, id_device):
+        self.name = sName
+        self.type = sType
+        self.state = sState
+        self.pin = sGpio
+        self.freq = sFreq
         self.id = id_device
         
     ############################################
     # Obtener ip externa de la RPi
     ############################################
-    def obtener_ip(self):
-        lista = "0123456789."
+    def get_ip(self):
+        liist = "0123456789."
         ip=""
-        dato=urllib2.urlopen("http://checkip.dyndns.org").read()
-        for x in str(dato):
-            if x in lista:
+        data=urllib2.urlopen("http://checkip.dyndns.org").read()
+        for x in str(data):
+            if x in liist:
                 ip += x
         return ip
     
@@ -59,6 +60,8 @@ class Dispositivo:
     ##################################################
     def get_code_verify (self):
 
+        ############# DESCOMENTAR ##############
+        '''
         file_config = ctes.FILE_WIFI_CONFIG
         if os.path.isfile(file_config):
             # Leer el archivo de configuracion:
@@ -67,38 +70,42 @@ class Dispositivo:
 
             if 'SECURITY' in configuracion.sections():
                 codeVerify = configuracion.get('SECURITY','VERIFY_CODE')
+
         return codeVerify
+        '''
+        ################## COMENTAR ##################
+        return 'bRm'
         
 
     #####################################################
     # Envio del comando inicial para establecer conexion
     #####################################################
     @abc.abstractmethod
-    def iniciar_conexion(self):
+    def start_connection(self):
         print("Enviamos peticion POST para conectarnos al servidor...")
         
     ######################################################
     # Envio de comandos para mantener la conexion abierta
     ######################################################
     @abc.abstractmethod
-    def mantener_conexion(self):
+    def keep_connection(self):
         print("Enviamos peticiones PUT para mantener la conexion con el servidor...")
         
     ##########################################
     # Conseguir la informacion de dispositivo 
     ##########################################
     @abc.abstractmethod
-    def obtener_informacion(self):
+    def get_info(self):
         print("Obtenemos la informacion actual para enviarla al servidor...")
     
     #############################################
-    # Guardar los datos en la BBDD
+    # Guardar los data en la BBDD
     # Param:
-    #   datos, datos a almacenar
+    #   data, data a almacenar
     #############################################
     @abc.abstractmethod
-    def guardar_datos(self, datos):
-        print("guardamos los datos leidos del dispositivo...")
+    def save_data(self, data):
+        print("guardamos los data leidos del device...")
         
 
 ##############################################################
@@ -106,41 +113,41 @@ class Dispositivo:
 # Nombre:
 #   Sensor
 # Descripcion:
-#   Clase que implementa a la clase Dispositivo en modo Sensor
+#   Clase que implementa a la clase Device en modo Sensor
 ###############################################################
-class Sensor(Dispositivo):
+class Sensor(Device):
     
-    def __init__(self, name, type, state, frecuencia, gpio):
+    def __init__(self, sName, sType, sState, sFreq, sGpio):
         print("Ini SENSOR")
-        self.nombre = name
-        self.tipo = type
-        self.estado = state
-        self.pin = gpio
-        self.freq = frecuencia
-        self.id = -1
+        self.name = sName
+        self.type = sType
+        self.state = sState
+        self.pin = sGpio
+        self.freq = sFreq
+        self.id = -1        
+        self.code = ""
     
-    def iniciar_conexion(self):
+    def start_connection(self):
         print("Conecta SENSOR")
         condition = True
-        ip = self.obtener_ip()
-        #code = get_code_verify()
+        ip = self.get_ip()
+        self.code = self.get_code_verify()
         while condition:
             print ("Esperando...")
             time.sleep(2)#Esperamos 2 segundos a recibir respuesta del servidor
-            headers={'Content-type': 'application/json', 'dev-auth': 'bRm'}
-            data_post = {"name" : self.nombre, "freq" : self.freq, "info" : "0", "IP": ip, "commands" : ["ON", "OFF", "+", "-"]}#, 'VeriFyCode':code}#tipo On/Off
+            headers={'Content-type': 'application/json', 'dev-auth': self.code}
+            data_post = {"name" : self.name, "freq" : self.freq, "info" : "0", "IP": ip, "commands" : ["ON", "OFF", "+", "-"]}
             #url = 'http://localhost/devices.php'
             url = 'http://88.1.141.187:2999/brimo/api/devices'
             json_str = json.dumps(data_post)
             post = requests.post(url=url, headers=headers, data=json_str)#, cert('/etc/lighttpd/certs/lighttpd.pem'))
             print ("\n\n--- POST - Sensor ---")
             print ("\tEstado:\t", post.status_code)
-            print ("\tTexto:\n",post.text)
-            print ("\tDatos:\n",json_str)
+            #print ("\tTexto:\n",post.text)
+            #print ("\tDatos:\n",json_str)
             condition = (post.status_code != 201)
             
-        # AQUI DEBO RECOGER EL ID ASIGNADO A ESTE SENSOR
-        
+        # AQUI DEBO RECOGER EL ID ASIGNADO A ESTE SENSOR        
         reply = post.json()
         self.id = reply['id']
         print ("\tID: ",self.id)
@@ -148,22 +155,22 @@ class Sensor(Dispositivo):
         #COMENTAR
         #self.id = 001
         
-    def mantener_conexion(self):        
-        #super(Dispositivo, self).mantiene()
+    def keep_connection(self):        
+        #super(Device, self).mantiene()
         condition = True
-        #code = get_code_verify()
+
         while condition:
             # ESPERAR TANTO TIEMPO COMO SE HAYA INDICADO EN EL POST ANTERIOR
             print ("Esperando...")
             time.sleep(self.freq)
             
             ######### DESCOMENTAR #########
-            #datos = self.obtener_informacion()
-            #temp, hum = datos
-            #info = "Temperatura="+format(temp)+"*, Humedad="+format(hum)
+            data = self.get_info()
+            temp, hum = data
+            info = "Temperatura="+format(temp)+"*, Humedad="+format(hum)
 
             ######### COMENTAR #########
-            info = "TEMPERATURA: x, HUMEDAD: y"
+            #info = "TEMPERATURA: x, HUMEDAD: y"
 
             if info != "ERROR":
                 # ESTE JSON DEBERIA FORMARSE CON LOS DATOS RECOGIDOS DEL SENSOR
@@ -171,53 +178,50 @@ class Sensor(Dispositivo):
                 data_put = {"id":self.id, "info":info}
                 #url = 'http://localhost/devices.php'
                 url = 'http://88.1.141.187:2999/brimo/api/devices/'+str(self.id)
-                print ("URL",url)
                 json_str = json.dumps(data_put)
                 put = requests.put(url=url, headers=headers, data=json_str)#, cert('/etc/lighttpd/certs/lighttpd.pem'))
                 print ("\n\n--- PUT- Sensor ---")
                 print ("\tEstado:\t", put.status_code)
                 #print ("\tTexto:\n",put.text)
-                self.guardar_datos(info)
+                self.save_data(data)
                 condition = (put.status_code == 200)
             else:
                 condition = False
                 print ("[Error PUT] Error al crear el elemento JSON")
     
-    def obtener_informacion(self):
-        #super(Dispositivo, self).obtiene_informacion()
+    def get_info(self):
+        #super(Device, self).obtiene_informacion()
         # Configuracion del tipo de sensor DHT
-        sensor = Adafruit_DHT.DHT11
+        ####################### DESCOMENTAR #####################
+        #sensor = Adafruit_DHT.DHT11        
+        #humidity, temp = Adafruit_DHT.read_retry(sensor, self.pin)
         
-        humedad, temperatura = Adafruit_DHT.read_retry(sensor, self.pin)
-        
-        #dummy - COMENTAR
+        ########## DUMMY - COMENTAR ###########
         return 15, 20
-        #return temperatura, humedad
+        return temp, humidity
     
-    def guardar_datos(self, datos):
+    def save_data(self, data):
         
-        fecha = time.strftime("%d%m%y")
-        hora = time.strftime("%X")
-        temperatura, humedad = datos
+        date = time.strftime("%d/%m/%Y")
+        ttime = time.strftime("%X")
+        print data
+        temp, humidity = data
 
         print("Id: ", self.id,type(self.id))
-        print("Fecha: ", fecha,type(fecha))
-        print("Hora: ", hora, type(hora))
-        print("Temperatura: ", temperatura, type(temperatura))
-        print("Humedad: ", humedad, type(humedad))
-        dat = "T: " + str(temperatura) + " - H: " + str(humedad)
+        dat = "T: " + str(temp) + " - H: " + str(humidity)
         print("Dat: ", dat, type(dat))
 
         ###################### DESCOMENTAR ######################
-        #conn = sqlite3.connect('/BBDD/devices_domotica.db')
-        #cursor = conn.cursor()
+        '''
+        conn = sqlite3.connect('./BBDD/devices_domotica.db')
+        cursor = conn.cursor()
 
-        #query = "INSERT INTO data_device (id, nombre, tipo, fecha, hora, dato) VALUES (?,?,?,?,?,?)"
-        #cursor.execute(query, (self.id, "Humedad y Temperatura", 'S', fecha, hora, dat))
+        query = "INSERT INTO data_device (id, ddate, time, info) VALUES (?,?,?,?)"
+        cursor.execute(query, (self.id, date, ttime, dat))
         
-        #conn.commit()
-        #conn.close()
-
+        conn.commit()
+        conn.close()
+        '''
         print("[SENSOR] Insercion correcta.")
 
 ##############################################################
@@ -225,45 +229,58 @@ class Sensor(Dispositivo):
 # Nombre:
 #   Actuador
 # Descripcion:
-#   Clase que implementa a la clase Dispositivo en modo Actuador
+#   Clase que implementa a la clase Device en modo Actuador
 ###############################################################
-class Actuador(Dispositivo):
+class Actuador(Device):
     
-    def __init__(self, name, type, state, frecuencia, gpio):
-        self.nombre = name
-        self.tipo = type
-        self.estado = state
-        self.pin = gpio
-        self.freq = frecuencia
+    def __init__(self, sName, sType, sState, sFreq, sGpio):
+        self.name = sName
+        self.type = sType
+        self.state = sState
+        self.pin = sGpio
+        self.freq = sFreq
         self.id = -1
-            
+        self.code = ""
+
+    ######### COMENTAR - ESTO ES SOLO PARA PROBAR SIN CORRER EL SERVIDOR ON/OFF #########  
     def prueba_borrar(self):#recojo de teclado si la activacion o desactivacion del rele
         print("INTRODUCIR On(1)/Off(0), PARA ACTIVAR O DESACTIVAR EL RELE: ")
         res = input()
         print(type(res))
-        return res
-        
+        return res  
+
     def ini_actuador(self):
+        '''
+        GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.pin, GPIO.OUT)
+        '''
+        return "------> Ini actuador"
         
     def activa_actuador(self):
+        '''
         GPIO.output(self.pin, GPIO.HIGH)
+        '''
+        return "------> Activar actuador"
         
     def desactiva_actuador(self):
-        GPIO.output(self.pin, GPIO.LOW)        
+        '''
+        GPIO.output(self.pin, GPIO.LOW)
+        '''
+        return "------> Desactivar actuador"
     
-    def iniciar_conexion(self):
+    #####################################################################################  
+
+    def start_connection(self):
         condition = True
-        ip = self.obtener_ip()
-        #code = get_code_verify()
-        print(type(ip), ip)
+        ip = self.get_ip()
+        self.code = self.get_code_verify()
 
         while condition:
             print ("Esperando...")
             time.sleep(2)            
-            headers={'Content-type': 'application/json', 'dev-auth': 'bRm'}
-            data_post = {"name" : self.nombre, "freq" : self.freq, "info" : "0", "IP": ip, "commands" : ["ON", "OFF", "+", "-"]}#, 'VeriFyCode':code}#tipo On/Off
+            headers={'Content-type': 'application/json', 'dev-auth': self.code}
+            data_post = {"name" : self.name, "freq" : self.freq, "info" : "0", "IP": ip, "commands" : ["ON", "OFF", "+", "-"]}
             #url = 'http://localhost/devices.php'
             url = 'http://88.1.141.187:2999/brimo/api/devices'
             json_str = json.dumps(data_post)
@@ -274,86 +291,85 @@ class Actuador(Dispositivo):
             print ("\tDatos:\n",json_str)
             condition = (post.status_code != 201)
         
-        #AQUI DEBO RECOGER EL ID ASIGNADO A ESTE SENSOR
-        
+        #AQUI DEBO RECOGER EL ID ASIGNADO A ESTE ACTUADOR        
         reply = post.json()
         self.id = reply['id']        
         print ("\tID: ",self.id)
         
-        
         #dummy - COMENTAR
         #self.id = 002
         
-    def mantener_conexion(self):
+    def keep_connection(self):
         condition = True
-        #self.ini_actuador()
-        #code = get_code_verify()
-        while condition:
-            # ESPERAR TANTO TIEMPO COMO SE HAYA INDICADO EN EL POST ANTERIOR
-            print ("Esperando...")
-            time.sleep(self.freq)
-            
-            # Recibo un post con la mi ip el json(id y la accion(ON/OF))
 
-            ######### DESCOMENTAR #########
-            # cada x tiempo (freq) enviar un put con la info necesaria
-            
-            #if self.prueba_borrar() == 1:
-            #    self.activa_actuador()
-            #else:
-            #    self.desactiva_actuador()
-            
-            #estado = self.obtener_informacion()
-            
-            ######### dummy - COMENTAR #########
-            estado = "ESTADO"
+        ######### COMENTAR - ESTO ES SOLO PARA PROBAR SIN CORRER EL SERVIDOR ON/OFF #########  
+        self.ini_actuador()
+        #####################################################################################
 
-            headers={'Content-type': 'application/json', 'dev-auth': 'bRm'}
-            data_put = {"id":self.id, "info":estado}
-            #url = 'http://localhost/devices.php'
-            url = 'http://88.1.141.187:2999/brimo/api/devices/'+str(self.id)
-            json_str = json.dumps(data_put)
-            put = requests.put(url=url, headers=headers, data=json_str)#, cert('/etc/lighttpd/certs/lighttpd.pem'))
-            print ("\n\n--- PUT - Actuador ---")
-            print ("\tEstado:\t", put.status_code)
-            print ("\tTexto:\n",put.text)
-            self.guardar_datos(estado)
-            condition = (put.status_code == 200)
-            #si no devuelve 200 enviar otra vez post ...
+        try:
+            while condition:
+                # ESPERAR TANTO TIEMPO COMO SE HAYA INDICADO EN EL POST ANTERIOR
+                print ("Esperando...")
+                time.sleep(self.freq)
+                
+                # Recibo un post con la mi ip el json(id y la accion(ON/OF))
+                ######### COMENTAR - ESTO ES SOLO PARA PROBAR SIN CORRER EL SERVIDOR ON/OFF #########
+                # cada x tiempo (freq) enviar un put con la info necesaria
+                
+                if self.prueba_borrar() == 1:
+                    self.activa_actuador()
+                else:
+                    self.desactiva_actuador()
+                #####################################################################################
+
+                state = self.get_info()
+                
+                headers={'Content-type': 'application/json', 'dev-auth': 'bRm'}
+                data_put = {"id":self.id, "info":state}
+                #url = 'http://localhost/devices.php'
+                url = 'http://88.1.141.187:2999/brimo/api/devices/'+str(self.id)
+                json_str = json.dumps(data_put)
+                put = requests.put(url=url, headers=headers, data=json_str)#, cert('/etc/lighttpd/certs/lighttpd.pem'))
+                
+                print ("\n\n--- PUT - Actuador ---")
+                print ("\tEstado:\t", put.status_code)
+                
+                self.save_data(state)
+                condition = (put.status_code == 200)
+                #si no devuelve 200 enviar otra vez post ...
+                
+        except KeyboardInterrupt:
+            GPIO.cleanup()
             
-    def guardar_datos(self, datos):
+    def save_data(self, data):
         
-        fecha = time.strftime("%d%m%y")
-        hora = time.strftime("%X")
+        date = time.strftime("%d%m%y")
+        ttime = time.strftime("%X")
         
         print("Id: ", self.id, type(self.id))
-        print("Fecha: ", fecha, type(fecha))
-        print("Hora: ", hora, type(hora))
-        print("Datos: ", datos, type(datos))
         
-
         ###################### DESCOMENTAR ######################
-        #conn = sqlite3.connect('/BBDD/devices_domotica.db')
-        #cursor = conn.cursor()
+        '''
+        conn = sqlite3.connect('./BBDD/devices_domotica.db')
+        cursor = conn.cursor()
 
-        #query = "INSERT INTO data_device (id, nombre, tipo, fecha, hora, dato) VALUES (?,?,?,?,?,?)"
-        #cursor.execute(query, (self.id, "Rele", 'A', fecha, hora, datos))
+        query = "INSERT INTO data_device (id, ddate, time, info) VALUES (?,?,?,?)"
+        cursor.execute(query, (self.id, "Rele", 'A', date, time, data))
         
-        #conn.commit()
-        #conn.close()
+        conn.commit()
+        conn.close()
+        '''
         print("[ACTUADOR] Insercion correcta.")
     
-    def obtener_informacion(self):
+    def get_info(self):
+        ########################### DESCOMENTAR ###################
+        '''
         if GPIO.input(self.pin) == GPIO.LOW:
             return "Inactivo" #el rele esta desactivado
         else:
             return "Activo" #el rele esta activado
-        
-    
-    
-    
-    
-    
-    
-    
-    
+        '''
+        ##########################################################
+
+        ######################## COMENTAR ##################################
+        return "<Estado del Actuador>"
