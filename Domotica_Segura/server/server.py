@@ -14,9 +14,9 @@ class myHandler(BaseHTTPRequestHandler):
     #   pin, GPIO al cual esta conectado el actuador
     ##########################################################################
     def config_RPi(self, pin):
-
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(pin, GPIO.OUT)
+        print("CONFIG")
 
     ##########################################################################
     # Activamos el GPIO que indica 'pin' al cual esta conectado el actuador
@@ -26,6 +26,7 @@ class myHandler(BaseHTTPRequestHandler):
     def activate_actuator(self, pin):
         self.config_RPi(pin)
         GPIO.output(pin, GPIO.HIGH)
+        print("ACTIVATE")
 
     ##########################################################################
     # Desactivamos el GPIO que indica 'pin' al cual esta conectado el actuador
@@ -35,6 +36,7 @@ class myHandler(BaseHTTPRequestHandler):
     def desactivate_actuator(self, pin):
         self.config_RPi(pin)
         GPIO.output(pin, GPIO.LOW)
+        print("DESACTIVATE")
 
     #############################################################
     # Guardar los data en la BBDD
@@ -102,12 +104,12 @@ class myHandler(BaseHTTPRequestHandler):
         row = cursor.fetchone()
         print ("ROW: ", row)
 
-	if row is None:
-	    print ("No existen dispositivos registrados para este identificador ("+id_device+")")
-	    self.send_response(400)
-	    self.send_header('Content-type','application/json')
-	    self.end_headers()
-	else:
+        if row is None:
+            print ("No existen dispositivos registrados para este identificador ("+id_device+")")
+            self.send_response(400)
+            self.send_header('Content-type','application/json')
+            self.end_headers()
+        else:
             print ("ROW[0]: ", row[0])
 
             pin = row[0]
@@ -116,11 +118,11 @@ class myHandler(BaseHTTPRequestHandler):
             print ("TIPO: ", dev_type)
 
             conn.commit()
-	    conn.close()
+            conn.close()
 
         if dev_type == 'A' and flag_response > 0:
 
-	    self.send_response(200)
+            self.send_response(200)
             self.send_header('Content-type','application/json')
             self.end_headers()
 
