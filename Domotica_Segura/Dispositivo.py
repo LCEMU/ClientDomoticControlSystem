@@ -323,7 +323,8 @@ class Actuador(Device):
         print("[ACTUADOR] Insercion correcta.")
 
     def get_info(self):
-	GPIO.setmode(GPIO_BCM)
+	GPIO.setmode(GPIO.BCM)
+        GPIO.setup(self.pin, GPIO.OUT)
         if GPIO.input(self.pin) == GPIO.LOW:
             return "Inactivo" #el rele esta desactivado
         else:

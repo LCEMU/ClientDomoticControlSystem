@@ -34,17 +34,18 @@
 				<table>
 					<tr>
 						<th>Red wifi seleccionada:</th>
-						<td><?php echo $wifi; ?></td>
+						<td><?php echo $wifi; ?></td><td></td>
 					</tr>
 					<tr>
 						<th>Password:</th>
-						<td id="password" type="password"><?php echo $pass;?>
-						<button class="btn btn-primary" type="button" onclick="mostrarPassword()">Mostrar</button>
+						<td><input id="password" type="password" value=<?php echo $pass;?> readonly>
+						<td>
+						<button class="btn btn-primary" type="button" id="button-info" onclick="mostrarPassword()">Mostrar</button>
 						</td>
 					</tr>
 					<tr>
 						<th>Código de verificación:</th>
-						<td><?php echo $codeVerify; ?></td>
+						<td><?php echo $codeVerify; ?></td><td></td>
 					</tr>
 				</table>
 				<input type='submit' value='Finalizar'>

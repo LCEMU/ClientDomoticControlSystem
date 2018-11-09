@@ -1,14 +1,24 @@
 h2 {
-	padding-top:	15px;
+    padding-top:	15px;
 }
 
-input[type=text], input[type=password], select {
+input[type=text] {
     width:	100%;
     padding:	12px 20px;
     margin:	8px 0;
     display:	inline-block;
     border:	1px solid #ccc;
     border-radius:	4px;
+    box-sizing: border-box;
+}
+
+input[type=password]{
+    width:      100%;
+    padding:    12px 20px;
+    margin:     8px 0;
+    display:    inline-block;
+    border:     1px solid #ccc;
+    border-radius:      4px;
     box-sizing: border-box;
 }
 
@@ -20,7 +30,18 @@ input[type=submit] {
     margin:	8px 0;
     border:	none;
     border-radius:	4px;
-    cursor:	pointer;
+    cursor:	pointer
+}
+
+button {
+    width:      100%;
+    background-color:   #65B06D;
+    color:      white;
+    padding:    14px 20px;
+    margin:     8px 0;
+    border:     none;
+    border-radius:      4px;
+    cursor:     pointer;
 }
 
 input[type=submit]:hover {
@@ -60,7 +81,6 @@ th {
 }
 
 td {
-    border:	1px solid #dddddd;
     text-align:	left;
     padding:	8px;
     background-color:	#FFFFFF;

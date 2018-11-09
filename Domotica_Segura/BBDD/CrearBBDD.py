@@ -23,7 +23,7 @@ cursor.execute('''CREATE TABLE activity_device
                 (ID INT NOT NULL,
                 DDATE TEXT NOT NULL,
                 TIME TEXT NOT NULL,
-                INFO TEXT NOT NULL)''')
+                INFO CHAR(50) NOT NULL)''')
 print (">> [OK] << La tabla ACTIVITY_DEVICE ha sido creada con exito")
 
 #print("\nIntentamos crear PK para DEVICE(id, pin)...")

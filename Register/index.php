@@ -26,7 +26,7 @@
 						Para iniciar el sistema que esta instalando deberá seguir los siguientes pasos:<br>
 						[1] Comprobar que tras su dispositivo se le ofrecen unas indicaciones como<br>
 						las mostradas a continuacion:<br><br>
-						<img src="INFO_RPI.png"><br><br>
+						<img src="/home/pi/Pictures/INFO_RPI.png"><br><br>
 						donde:<br>
 						URL: es la ruta que usted ha escrito en el navegador<br>
 						para acceder a esta pagina.<br>

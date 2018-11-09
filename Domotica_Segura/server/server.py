@@ -15,7 +15,7 @@ class myHandler(BaseHTTPRequestHandler):
     ##########################################################################
     def config_RPi(self, pin):
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(pin, GPIO.OUT)
+        GPIO.setup(int(pin), GPIO.OUT)
         print("CONFIG")
 
     ##########################################################################
@@ -24,8 +24,8 @@ class myHandler(BaseHTTPRequestHandler):
     #   pin, GPIO al cual esta conectado el actuador
     ##########################################################################
     def activate_actuator(self, pin):
-        self.config_RPi(pin)
-        GPIO.output(pin, GPIO.HIGH)
+        self.config_RPi(int(pin))
+        GPIO.output(int(pin), GPIO.HIGH)
         print("ACTIVATE")
 
     ##########################################################################
@@ -34,8 +34,8 @@ class myHandler(BaseHTTPRequestHandler):
     #   pin, GPIO al cual esta conectado el actuador
     ##########################################################################
     def desactivate_actuator(self, pin):
-        self.config_RPi(pin)
-        GPIO.output(pin, GPIO.LOW)
+        self.config_RPi(int(pin))
+        GPIO.output(int(pin), GPIO.LOW)
         print("DESACTIVATE")
 
     #############################################################

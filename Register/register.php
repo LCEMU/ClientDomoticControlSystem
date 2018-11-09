@@ -15,7 +15,7 @@
 
 					<h3>Password: <span class="error">*</span></h3>
 					<input type='password' name='password' id="password"  placeholder="Introduzca aqui la password de su red wifi">
-					<button class="btn btn-primary" type="button" onclick="mostrarPassword()">Mostrar</button>
+					<button class="btn btn-primary" type="button" id="button-reg" onclick="mostrarPassword()">Mostrar</button>
 
 					<h3>Código de verificación: <span class="error">*</span></h3>
 					<input type='text' name='codeVerify' placeholder="Introduzca aqui el código situado tras el dispositivo">
