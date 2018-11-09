@@ -3,7 +3,7 @@
 import sqlite3
 
 print("\nIntentamos crear la BBDD...")
-conn = sqlite3.connect('./BBDD/devices_domotica.db')
+conn = sqlite3.connect('./BBDD/DomoticControlSystem.db')
 
 cursor = conn.cursor()
 

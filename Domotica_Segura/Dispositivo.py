@@ -4,7 +4,7 @@ import requests
 import time
 import ConfigParser as cp
 import Constantes as ctes
-            ######### DESCOMENTAR #########
+
 import Adafruit_DHT
 import RPi.GPIO as GPIO
 
@@ -13,7 +13,7 @@ import urllib2
 from urllib2 import Request
 import abc
 from abc import ABCMeta
-
+import subprocess
 import sqlite3
 
 ##########################################################
@@ -168,7 +168,7 @@ class Sensor(Device):
     def keep_connection(self):
         condition = True
 
-        conn = sqlite3.connect('./BBDD/devices_domotica.db')
+        conn = sqlite3.connect('./BBDD/DomoticControlSystem.db')
         cursor = conn.cursor()
         name = 'S'+str(self.pin)
 
@@ -226,7 +226,7 @@ class Sensor(Device):
         dat = "T: " + str(temp) + " - H: " + str(humidity)
 
         ###################### DESCOMENTAR ######################
-        conn = sqlite3.connect('./BBDD/devices_domotica.db')
+        conn = sqlite3.connect('./BBDD/DomoticControlSystem.db')
         cursor = conn.cursor()
 
         query = "INSERT INTO activity_device (id, ddate, time, info) VALUES (?,?,?,?)"
@@ -284,7 +284,7 @@ class Actuador(Device):
     def keep_connection(self):
         condition = True
 
-        conn = sqlite3.connect('./BBDD/devices_domotica.db')
+        conn = sqlite3.connect('./BBDD/DomoticControlSystem.db')
         cursor = conn.cursor()
         name = 'A'+str(self.pin)
 
@@ -327,7 +327,7 @@ class Actuador(Device):
         print("Id: ", self.id, type(self.id))
 
         ###################### DESCOMENTAR ######################
-        conn = sqlite3.connect('./BBDD/devices_domotica.db')
+        conn = sqlite3.connect('./BBDD/DomoticControlSystem.db')
         cursor = conn.cursor()
 
         query = "INSERT INTO activity_device (id, ddate, time, info) VALUES (?,?,?,?)"
@@ -342,6 +342,6 @@ class Actuador(Device):
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.pin, GPIO.OUT)
         if GPIO.input(self.pin) == GPIO.LOW:
-            return "Inactivo" #el rele esta desactivado
+            return "Disable" #el rele esta desactivado
         else:
-            return "Activo" #el rele esta activado
+            return "Enable" #el rele esta activado

@@ -70,9 +70,9 @@ class myHandler(BaseHTTPRequestHandler):
     def do_POST(self):
 
         flag_response = 0
+        dev_type = ''
 
         print(">>> Recibo POST <<<")
-        print("[[ A - CONTENT-LENGTH ]]: ",self.headers.get('content-length'))
         length = int(self.headers.get('content-length'))
         post_body = self.rfile.read(length)
 
@@ -91,8 +91,6 @@ class myHandler(BaseHTTPRequestHandler):
         print("{}".format(json_in))
         id_device = json_in["Id"]
         action = json_in["Action"]
-        print("ID: ",id_device)
-        print("ACTION: ",action)
         print(json_in["Action"] == "On")
 
         conn = sqlite3.connect('./BBDD/devices_domotica.db')
@@ -102,7 +100,6 @@ class myHandler(BaseHTTPRequestHandler):
         cursor.execute(query, (id_device,))
 
         row = cursor.fetchone()
-        print ("ROW: ", row)
 
         if row is None:
             print ("No existen dispositivos registrados para este identificador ("+id_device+")")
@@ -110,8 +107,6 @@ class myHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type','application/json')
             self.end_headers()
         else:
-            print ("ROW[0]: ", row[0])
-
             pin = row[0]
             print ("PIN: ", pin)
             dev_type = row[1]
