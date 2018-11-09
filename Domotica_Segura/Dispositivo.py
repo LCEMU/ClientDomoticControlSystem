@@ -44,9 +44,9 @@ class Device:
         self.id = id_device
 
     ############################################
-    # Obtener ip externa de la RPi
+    # Obtener ip publica
     ############################################
-    def get_ip(self):
+    def get_public_ip_net(self):
         liist = "0123456789."
         ip=""
         data=urllib2.urlopen("http://checkip.dyndns.org").read()
@@ -54,6 +54,20 @@ class Device:
             if x in liist:
                 ip += x
         return ip
+
+    ############################################
+    # Obtener ip de la subred
+    ############################################
+    def get_ip_subnet(self):
+        wlan0 = subprocess.check_output('ifconfig wlan0 | grep "inet "', shell=True)
+        wlan0 = wlan0.split()
+        wlan0_map = map(lambda x: x.decode('UTF-8'), wlan0)
+        count=0
+        if "inet" in wlan0_map:
+            ip = wlan0[1].decode('UTF-8')
+            return ip
+        else:
+            return ctes.ERR
 
     ##################################################
     # Conseguir el codigo de verificacion del cliente
@@ -129,14 +143,15 @@ class Sensor(Device):
     def start_connection(self):
         print("Conecta SENSOR")
         condition = True
-        ip = self.get_ip()
+        ip = self.get_public_ip_net()
+        ip_subnet = self.get_ip_subnet()
         self.code = self.get_code_verify()
 
         while condition:
             print ("Esperando...")
             time.sleep(2)#Esperamos 2 segundos a recibir respuesta del servidor
             headers={'Content-type': 'application/json', 'dev-auth': self.code}
-            data_post = {"name" : self.name, "freq" : self.freq, "info" : "0", "IP": ip, "commands" : ["ON", "OFF", "+", "-"]}
+            data_post = {"name" : self.name, "freq" : self.freq, "info" : "0", "IP": ip, "IPsubnet" : ip_subnet, "commands" : ["ON", "OFF", "+", "-"]}
             #url = 'http://localhost/devices.php'
             url = 'http://88.1.141.187:2999/brimo/api/devices'
             json_str = json.dumps(data_post)
@@ -153,7 +168,7 @@ class Sensor(Device):
     def keep_connection(self):
         condition = True
 
-	conn = sqlite3.connect('./BBDD/devices_domotica.db')
+        conn = sqlite3.connect('./BBDD/devices_domotica.db')
         cursor = conn.cursor()
         name = 'S'+str(self.pin)
 
@@ -242,14 +257,15 @@ class Actuador(Device):
 
     def start_connection(self):
         condition = True
-        ip = self.get_ip()
+        ip = self.get_public_ip_net()
+        ip_subnet = self.get_ip_subnet()
         self.code = self.get_code_verify()
 
         while condition:
             print ("Esperando...")
             time.sleep(2)
             headers={'Content-type': 'application/json', 'dev-auth': self.code}
-            data_post = {"name" : self.name, "freq" : self.freq, "info" : "0", "IP": ip, "commands" : ["ON", "OFF", "+", "-"]}
+            data_post = {"name" : self.name, "freq" : self.freq, "info" : "0", "IP": ip, "IPsubnet" : ip_subnet, "commands" : ["ON", "OFF", "+", "-"]}
             #url = 'http://localhost/devices.php'
             url = 'http://88.1.141.187:2999/brimo/api/devices'
             json_str = json.dumps(data_post)
@@ -323,7 +339,7 @@ class Actuador(Device):
         print("[ACTUADOR] Insercion correcta.")
 
     def get_info(self):
-	GPIO.setmode(GPIO.BCM)
+        GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.pin, GPIO.OUT)
         if GPIO.input(self.pin) == GPIO.LOW:
             return "Inactivo" #el rele esta desactivado
