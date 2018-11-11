@@ -53,6 +53,7 @@ class Device:
         for x in str(data):
             if x in liist:
                 ip += x
+        ctes.LOG = ctes.LOG + ctes.hora + "File Dispositivo.py [INFO] Public IP: \n" + ip
         return ip
 
     ############################################
@@ -65,8 +66,10 @@ class Device:
         count=0
         if "inet" in wlan0_map:
             ip = wlan0[1].decode('UTF-8')
+            ctes.LOG = ctes.LOG + ctes.hora + "File Dispositivo.py [INFO] Subnet IP: " + ip +"/n"
             return ip
         else:
+            ctes.LOG = ctes.LOG + ctes.hora + "File Dispositivo.py [ERR] get_ip_subnet\n"
             return ctes.ERR
 
     ##################################################
@@ -153,17 +156,17 @@ class Sensor(Device):
             headers={'Content-type': 'application/json', 'dev-auth': self.code}
             data_post = {"name" : self.name, "freq" : self.freq, "info" : "0", "IP": ip, "IPsubnet" : ip_subnet, "commands" : ["ON", "OFF", "+", "-"]}
             #url = 'http://localhost/devices.php'
-            url = 'http://88.1.141.187:2999/brimo/api/devices'
+            url = 'http://88.1.141.187:3000/brimo/api/devices'
             json_str = json.dumps(data_post)
-            post = requests.post(url=url, headers=headers, data=json_str)#, cert('/etc/lighttpd/certs/lighttpd.pem'))
+            post = requests.post(url=url, headers=headers, data=json_str, cert=('./SSL/client1-crt.pem', './SSL/client1-key.pem'))
             print ("\n\n--- POST - Sensor ---")
-            print ("\tEstado:\t", post.status_code)
+            ctes.LOG = ctes.LOG + ctes.hora + "File Dispositivo.py [INFO] Json Post Sensor:"+json_str+"/nStatus: "+str(post.status_code)+"/n"
             condition = (post.status_code != 201)
 
         # AQUI DEBO RECOGER EL ID ASIGNADO A ESTE SENSOR
         reply = post.json()
         self.id = reply['id']
-        print ("\tID: ",self.id)
+        ctes.LOG = ctes.LOG + ctes.hora + "File Dispositivo.py [INFO] Id Sensor: "+str(self.id)+"/n"
 
     def keep_connection(self):
         condition = True
@@ -179,25 +182,21 @@ class Sensor(Device):
         conn.close()
 
         while condition:
-            # ESPERAR TANTO TIEMPO COMO SE HAYA INDICADO EN EL POST ANTERIOR
             print ("Esperando...")
             time.sleep(self.freq)
 
-            ######### DESCOMENTAR #########
             data = self.get_info()
             temp, hum = data
             info = "Temperatura="+format(temp)+"*, Humedad="+format(hum)
 
             if info != "ERROR":
-                # ESTE JSON DEBERIA FORMARSE CON LOS DATOS RECOGIDOS DEL SENSOR
                 headers={'Content-type': 'application/json', 'dev-auth': 'bRm'}
                 data_put = {"id":self.id, "info":info}
-                #url = 'http://localhost/devices.php'
-                url = 'http://88.1.141.187:2999/brimo/api/devices/'+str(self.id)
+                url = 'http://88.1.141.187:3000/brimo/api/devices/'+str(self.id)
                 json_str = json.dumps(data_put)
-                put = requests.put(url=url, headers=headers, data=json_str)#, cert('/etc/lighttpd/certs/lighttpd.pem'))
+                put = requests.put(url=url, headers=headers, data=json_str, cert=('./SSL/client1-crt.pem', './SSL/client1-key.pem'))
                 print ("\n\n--- PUT- Sensor ---")
-                print ("\tEstado:\t", put.status_code)
+                ctes.LOG = ctes.LOG + ctes.hora + "File Dispositivo.py [INFO] Json Put Sensor:"+json_str+"/nStatus: "+str(put.status_code)+"/n"
                 self.save_data(data)
                 condition = (put.status_code == 200)
             else:
@@ -205,27 +204,18 @@ class Sensor(Device):
                 print ("[Error PUT] Error al crear el elemento JSON")
 
     def get_info(self):
-
         # Configuracion del tipo de sensor DHT
-        ####################### DESCOMENTAR #####################
         sensor = Adafruit_DHT.DHT11
         humidity, temp = Adafruit_DHT.read_retry(sensor, self.pin)
-
-        ######### DUMMY - COMENTAR ###########
-        #return 15, 20
         return temp, humidity
 
     def save_data(self, data):
 
         date = time.strftime("%d/%m/%Y")
         ttime = time.strftime("%X")
-        print data
         temp, humidity = data
-
-        print("Id: ", self.id,type(self.id))
         dat = "T: " + str(temp) + " - H: " + str(humidity)
 
-        ###################### DESCOMENTAR ######################
         conn = sqlite3.connect('./BBDD/DomoticControlSystem.db')
         cursor = conn.cursor()
 
@@ -235,7 +225,7 @@ class Sensor(Device):
         conn.commit()
         conn.close()
 
-        print("[SENSOR] Insercion correcta.")
+        ctes.LOG = ctes.LOG + ctes.hora + "File Dispositivo.py [INFO] SENSOR Insercion correcta./n-"
 
 ##############################################################
 # Clase
@@ -266,20 +256,17 @@ class Actuador(Device):
             time.sleep(2)
             headers={'Content-type': 'application/json', 'dev-auth': self.code}
             data_post = {"name" : self.name, "freq" : self.freq, "info" : "0", "IP": ip, "IPsubnet" : ip_subnet, "commands" : ["ON", "OFF", "+", "-"]}
-            #url = 'http://localhost/devices.php'
-            url = 'http://88.1.141.187:2999/brimo/api/devices'
+            url = 'http://88.1.141.187:3000/brimo/api/devices'
             json_str = json.dumps(data_post)
-            post = requests.post(url=url, headers=headers, data=json_str)#, cert('/etc/lighttpd/certs/lighttpd.pem'))
-            print ("\n\n--- POST - Actuador ---")
-            print ("\tEstado:\t", post.status_code)
-            print ("\tTexto:\n",post.text)
-            print ("\tDatos:\n",json_str)
+            post = requests.post(url=url, headers=headers, data=json_str, cert=('./SSL/client1-crt.pem', './SSL/client1-key.pem'))
+            print ("\n\n--- POST - Actuator ---")
+            ctes.LOG = ctes.LOG + ctes.hora + "File Dispositivo.py [INFO] Json Post Sensor:"+json_str+"/nStatus: "+str(post.status_code)+"/n"
             condition = (post.status_code != 201)
 
         #AQUI DEBO RECOGER EL ID ASIGNADO A ESTE ACTUADOR
         reply = post.json()
-	self.id = reply['id']
-        print ("\tID: ",self.id)
+        self.id = reply['id']
+        ctes.LOG = ctes.LOG + ctes.hora + "File Dispositivo.py [INFO] Id Sensor: "+str(self.id)+"/n"
 
     def keep_connection(self):
         condition = True
@@ -304,13 +291,11 @@ class Actuador(Device):
 
                 headers={'Content-type': 'application/json', 'dev-auth': 'bRm'}
                 data_put = {"id":self.id, "info":state}
-                #url = 'http://localhost/devices.php'
-                url = 'http://88.1.141.187:2999/brimo/api/devices/'+str(self.id)
+                url = 'http://88.1.141.187:3000/brimo/api/devices/'+str(self.id)
                 json_str = json.dumps(data_put)
-                put = requests.put(url=url, headers=headers, data=json_str)#, cert('/etc/lighttpd/certs/lighttpd.pem'))
-
+                put = requests.put(url=url, headers=headers, data=json_str, cert=('./SSL/client1-crt.pem', './SSL/client1-key.pem'))
                 print ("\n\n--- PUT - Actuador ---")
-                print ("\tEstado:\t", put.status_code)
+                ctes.LOG = ctes.LOG + ctes.hora + "File Dispositivo.py [INFO] Json Put Sensor:"+json_str+"/nStatus: "+str(put.status_code)+"/n"
 
                 self.save_data(state)
                 condition = (put.status_code == 200)
@@ -324,9 +309,6 @@ class Actuador(Device):
         date = time.strftime("%d/%m/%Y")
         ttime = time.strftime("%X")
 
-        print("Id: ", self.id, type(self.id))
-
-        ###################### DESCOMENTAR ######################
         conn = sqlite3.connect('./BBDD/DomoticControlSystem.db')
         cursor = conn.cursor()
 
@@ -336,7 +318,7 @@ class Actuador(Device):
         conn.commit()
         conn.close()
 
-        print("[ACTUADOR] Insercion correcta.")
+        ctes.LOG = ctes.LOG + ctes.hora + "File Dispositivo.py [INFO] ACTUADOR Insercion correcta./n-"
 
     def get_info(self):
         GPIO.setmode(GPIO.BCM)

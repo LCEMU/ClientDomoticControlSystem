@@ -24,7 +24,7 @@ input[type=password]{
 
 input[type=submit] {
     width:	100%;
-    background-color:	#4CAF50;
+    background-color:	#086A87;
     color:	white;
     padding:	14px 20px;
     margin:	8px 0;
@@ -35,7 +35,7 @@ input[type=submit] {
 
 button {
     width:      100%;
-    background-color:   #65B06D;
+    background-color:   #086A87;
     color:      white;
     padding:    14px 20px;
     margin:     8px 0;
@@ -45,7 +45,7 @@ button {
 }
 
 input[type=submit]:hover {
-    background-color:	#45a049;
+    background-color:	#5592b5;
 }
 
 div.out {
@@ -57,7 +57,7 @@ div.out {
 
 div.in {
     border-radius:	5px;
-    background:		#F2F2F2;
+    background:		#2060ef14;
     padding-left:	100px;
     padding-right:	100px;
     padding-bottom:	100px;
@@ -92,5 +92,5 @@ p.aviso {
 }
 
 .error {
-	color: #FF0000;
+	color: #FE2E9A;
 }

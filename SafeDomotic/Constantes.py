@@ -26,7 +26,7 @@ IP = "88.1.141.187:2999"
 FILE_AP = "/etc/dhcpcd.conf"
 FILE_INTERFACES = "/etc/network/interfaces"
 FILE_WIFI_CONFIG = "/var/www/html/Register/WifiConnect.cfg"
-FILE_LOG = "/home/pi/Desktop/Domotica_Segura/Log/DomoticSystem"+fecha+".log"
+FILE_LOG = "./Log/DomoticSystem"+fecha+".log"
 
 FLAG_ON_AP = "#AP_ACTIVA\n"
 FLAG_OFF_AP = "#AP_DESACTIVADA\n"
