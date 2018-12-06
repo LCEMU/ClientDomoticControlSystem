@@ -1,9 +1,9 @@
 import os
-import commands
+#import commands
+import subprocess
 import ConfigAP
 import Constantes as ctes
 import time
-
 
 ##############################################################
 # Funcion
@@ -13,16 +13,11 @@ import time
 #   Comprueba si la RPi esta conextada al wifi correctamente
 ###############################################################
 def comprobarConexion():
-    wlan0=commands.getoutput('ifconfig wlan0')
-    wlan0 = wlan0.split(' ')
+    wlan0 = subprocess.check_output('ifconfig wlan0 | grep "inet "', shell=True)
+    wlan0 = wlan0.split()
+    wlan0_map = map(lambda x: x.decode('UTF-8'), wlan0)
     count=0
-    if "inet" in wlan0:
-        for i in wlan0:
-            if i=="inet":
-                break
-            count += 1
-        print(wlan0[count+1])
-        ctes.LOG = ctes.LOG + str(wlan0[count+1])
+    if "inet" in wlan0_map:
         return ctes.OK
     else:
         return ctes.ERR
@@ -50,8 +45,6 @@ def delete_credentials():
 
 ## MAIN ##
 if __name__ == '__main__':
-    #Esperamos 10 segundos para que la rpi acabe de iniciarse y luego comprobamos la conexion
-    #time.sleep(10)
     cap = ConfigAP.ConfigAP()
 
     #Comprobamos si tenemos una IP asignada, es decir, si estamos conectados a algun wifi

@@ -23,11 +23,11 @@
 					}else{
 						?>
 						<h2>¡ Bienvenido !</h2>
-						<h3>Acaba de acceder a la web su nuevo sistema de control domótico.<br><br>
-						Si pulsa el botón 'Comenzar' verá un formulario que debe completar con las credenciales de<br><br>
-						conexión a su red WiFi. De este modo usted podrá comunicarse con el sistema desde cualquier<br><br>
-						lugar. También deberá introducir un código de verificación que enconetrará en su Gatewa<br><br>
-						identificado con las siglas 'CV'.<h3>
+						Acaba de acceder a la web su nuevo sistema de control domótico.<br><br>
+						Si pulsa el botón 'Comenzar' verá un formulario que debe completar con las credenciales<br><br>
+						de conexión a su red WiFi. De este modo usted podrá comunicarse con el sistema desde cualquier lugar.<br><br>
+						También deberá introducir un código de verificación que enconetrará en su Gatewa<br><br>
+						identificado con las siglas 'CV'.
 						<form action="register.php" method="post">
 							<input type="submit" value="Comenzar">
 						</form>
