@@ -166,6 +166,7 @@ class Sensor(Device):
         # AQUI DEBO RECOGER EL ID ASIGNADO A ESTE SENSOR
         reply = post.json()
         self.id = reply['id']
+	print ("Id actuador: ",self.id)
         ctes.LOG = ctes.LOG + ctes.hora + "File Dispositivo.py [INFO] Id Sensor: "+str(self.id)+"/n"
 
     def keep_connection(self):
@@ -266,6 +267,7 @@ class Actuador(Device):
         #AQUI DEBO RECOGER EL ID ASIGNADO A ESTE ACTUADOR
         reply = post.json()
         self.id = reply['id']
+	print ("Id sensor: ",self.id)
         ctes.LOG = ctes.LOG + ctes.hora + "File Dispositivo.py [INFO] Id Sensor: "+str(self.id)+"/n"
 
     def keep_connection(self):
